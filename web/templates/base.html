@@ -1,0 +1,64 @@
+{% load static %}<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>{% block title %}My School{% endblock %}</title>
+    <link rel="icon" href="{% static 'img/favicon.png' %}">
+    <!-- <link href="https://fonts.googleapis.com/css?family=Clicker+Script" rel="stylesheet"> -->
+    <link rel="stylesheet" href="{% static 'css_1/bootstrap.min.css' %}">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+
+    <link rel="stylesheet" type="text/css" href="{% static 'vendor/fontello-2f186091/css/fontello.css' %}">
+    <link rel="stylesheet" href="{% static 'css_1/font-awesome.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css_1/app.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css_1/teachers.css' %}">
+     {% block js %}
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+
+<script src="{% static "js/jquery-2.1.4.min.js" %}"></script> 
+<script src="{% static "js/jquery.validate.min.js" %}"></script> 
+<script src="{% static "js/jquery-ui.min.js" %}"></script> 
+<script src="{% static "js/bootstrap.min.js" %}"></script>
+{% endblock js %}
+  </head>
+  <body>
+    <div class="container my-4">
+      <div class="row justify-content-center">
+        <div class="col-md-10 col-sm-12">
+          <div class="row">
+            <div class="col-6">
+              <h1 class="logo">
+                <a href="{% url 'home' %}">
+                  My School
+                  {% if user.is_authenticated %}
+                      <span class="icon-graduation-cap" data-toggle="tooltip" data-placement="right" title="Teacher profile"></span>
+                  {% endif %}
+                </a>
+              </h1>
+            </div>
+            <div class="col-6 text-right">
+              {% if user.is_authenticated %}
+                <p class="pt-3"><a href="{% url 'home' %}">Home</a> | <a href="{% url 'teacher_logout' %}">Log out</a></p>
+              {% else %}
+                <a href="{% url 'teacher_login' %}" class="btn btn-light" role="button">Log in</a>
+              {% endif %}
+            </div>
+          </div>
+          <div class="card mb-3">
+            <div class="card-body">
+              {% block content %}
+              {% endblock %}
+            </div>
+          </div>
+          <footer>
+          
+          </footer>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

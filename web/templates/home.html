@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Welcome {{ user.username }}, <span class="icon-emo-happy"></span></h2>
+  {%if not user.is_superuser%}
+  <p class="lead">
+    Subject you handle: {{teacher.subject.name}}
+  </p>
+  <hr>
+  <p>
+   Want to add marks to the students? Please <a href="{% url 'assign_marks' %}">click here</a>
+  </p>
+  <p>
+   Want to view or edit marks of the students? Please <a href="{% url 'edit_marks' %}">click here</a>
+  </p>
+  {%endif%}
+
+  {%if user.is_superuser%}
+  <p class="lead">
+  </p>
+  <hr>
+  <p>
+   Want to generate rank for the students? Please <a href="{% url 'generate_rank' %}">click here</a>
+  </p>
+    <p>
+   Want to add students in bulk? Please <a href="{% url 'add_students_in_bulk' %}">click here</a>
+  </p>
+  {%endif%}
+{% endblock %}

@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% block js %}
+{{block.super}}  
+<script type="text/javascript">
+$(document).ready(function(){
+
+	$('body').on('click', '.dev_marks_submit', function(){
+	var data = {}
+  var error = false
+
+	$("#student_list tr.student_mark").each(function(){
+                      if (!$(this).find('input').val() || $(this).find('input').val() == ""){
+                        alert("Please enter marks for all the students");
+                        error = true
+                        return false
+                      }
+                      if (parseInt($(this).find('input').val())<0 || parseInt($(this).find('input').val())>100){
+                          alert("Marks should be greater than or equal to 0 and less than or equal to 100");
+                          error = true
+                          return false
+                      }
+                      data [$(this).find('.student_id').attr('id')] =  $(this).find('input').val()
+
+                });
+  if (error == true){
+    return false
+  }
+
+  var input_data = {'teacher_id':$('.teacher_id').val(), 'subject_id':$('.subject_id').val(), 'data':data}
+  $.ajax({
+          url: "/api/v1/mark/",
+          type: 'POST',
+          data: JSON.stringify(input_data),
+          contentType: 'application/json',
+          dataType: 'json',
+          beforeSend: function(jqXHR, settings) {
+                      jqXHR.setRequestHeader('X-CSRFToken', $('input[name=csrfmiddlewaretoken]').val());
+          },
+          success: function(data){
+                alert("Marks has been successfully added")
+                window.location.href = "{% url 'edit_marks' %}";
+               },
+          error: function(xhr, status, error){
+            
+          }
+
+        });
+
+
+});
+
+});
+
+</script>
+{% endblock js %}
+{% block content %}
+<p>Student Listing</p>
+<input type="hidden" class="subject_id" value="{{teacher.subject.id}}">
+<input type="hidden" class="teacher_id" value="{{teacher.id}}">
+<table border="1" cellspacing="0" cellpadding="0" class="" width="100%" id="student_list">
+              <thead>
+              	<tr class="" id="">
+                <td align="center" id="student_id"><b>Student Name</b></td>
+                <td align="center"><b>{{teacher.subject.name}} Mark</b></td>
+              </tr>
+          </thead>
+          <tbody>
+  {% if student_obj %}
+              {% for student in student_obj %}
+              <tr class="student_mark">
+                <td align="center" class="student_id" id="{{student.id}}">{{student.name}}</td>
+                <td align="center" class="student_mark"><input style="width:50%;" type="text" name="mark"></td>
+              </tr>
+              {% endfor %}
+              {% else %}
+              <tr class="white-bg" id="no_content_row">
+                <td colspan="6"><div class="col-full top-bottom">
+                    <p class="text-center float-none"><i class="fa fa-exclamation-circle">&nbsp;</i>Looks like you have already added marks to all the students. Need to view or edit the marks? Please <a href="{% url 'edit_marks' %}">click here</a></p>
+                  </div></td>
+              </tr>
+              {% endif %}
+                </tbody>
+            </table>
+          <div class="modal-footer">
+        <button type="button" class="btn btn-default adjust-top dev_marks_submit" id="btn-submit-marks">Submit</button>
+      </div>
+{% endblock %}

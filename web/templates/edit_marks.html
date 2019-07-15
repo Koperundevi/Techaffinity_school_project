@@ -1,0 +1,151 @@
+{% extends 'base.html' %}
+{% block js %}
+{{block.super}}  
+<script type="text/javascript">
+$(document).ready(function(){
+
+  $('body').on('click', '.edit_mark_submit', function(){
+          $('#model-edit-mark').modal('hide');
+          $form = $('#update_mark_form');
+          updated_mark = $($form).find('#mark').val()
+          mark_id = $form.find('#mark_id').val()
+          if (!updated_mark || updated_mark == ""){
+            alert('Please enter mark')
+            return false
+          }
+
+          $.ajax({
+                url: $($form).attr('action'),
+                type: 'PATCH',
+                data: JSON.stringify({'mark':updated_mark, 'mark_id': mark_id}),
+                contentType: 'application/json',
+                dataType: 'json',
+                success: function(resp_data){
+                  alert("Student mark has been updated succesfully")
+                  $('#model-edit-mark').modal('hide');
+                  $('#'+mark_id).html(updated_mark)
+                  $('a[data-id="'+mark_id+'"]').attr('data-mark', updated_mark);
+
+                },
+            error: function(xhr, status, error){
+                var response = jQuery.parseJSON(xhr.responseText).error_message;
+                alert(response);
+          }
+          });
+    });
+
+
+  $(document).on('click','.dev_edit_mark',function(e){
+      e.preventDefault();
+      $('#update_mark_form input').val('');
+
+      $form = $('#update_mark_form');
+      $form.find('#mark').val($(this).attr('data-mark'));
+      $form.find('#mark_id').val($(this).attr('data-id'));
+      $('#model-edit-mark').modal('show');
+
+    });
+
+
+	$('body').on('click', '.dev_marks_submit', function(){
+	var data = {}
+	$("#student_list tr.student_mark").each(function(){
+                      if (parseInt($(this).find('input').val())<0 && parseInt($(this).find('input').val())>=100){
+                          alert("Marks should be greater than or equal to 0 and less than or equal to 100")
+                          return false
+                      }
+                      data [$(this).find('.student_id').attr('id')] =  $(this).find('input').val()
+
+                });
+
+  var input_data = {'teacher_id':$('.teacher_id').val(), 'subject_id':$('.subject_id').val(), 'data':data}
+  $.ajax({
+          url: "/api/v1/mark/",
+          type: 'POST',
+          data: JSON.stringify(input_data),
+          contentType: 'application/json',
+          dataType: 'json',
+          beforeSend: function(jqXHR, settings) {
+                      jqXHR.setRequestHeader('X-CSRFToken', $('input[name=csrfmiddlewaretoken]').val());
+          },
+          success: function(data){
+                alert("Marks has been successfully added")
+               },
+          error: function(xhr, status, error){
+            var response = jQuery.parseJSON(xhr.responseText).error_message;
+            alert(response);
+          }
+
+        });
+
+
+});
+
+});
+
+</script>
+{% endblock js %}
+{% block content %}
+<p>Student Listing</p>
+<input type="hidden" class="subject_id" value="{{teacher.subject.id}}">
+<input type="hidden" class="teacher_id" value="{{teacher.id}}">
+<table border="1" cellspacing="0" cellpadding="0" class="" width="100%" id="student_list">
+              <thead>
+              	<tr class="" id="">
+                <td align="center" id="student_id"><b>Student Name</b></td>
+                <td align="center"><b>{{teacher.subject.name}} Mark</b></td>
+                <td align="center"><b>Edit Mark</b></td>
+              </tr>
+          </thead>
+          <tbody>
+  {% if marks_obj %}
+              {% for mark in marks_obj %}
+              <tr class="student_mark">
+                <td align="center" class="student_id" id="{{mark.student.id}}">{{mark.student.name}}</td>
+                <td align="center" class="student_mark" id="{{mark.id}}">{{mark.score}}</td>
+                <td align="center"><a class="dev_edit_mark" data-id='{{mark.id}}' data-type="Edit" data-mark='{{mark.score}}' href="#" style="color:inherit;"><i class="fa fa-edit">&nbsp;</i></a></td>
+              </tr>
+              {% endfor %}
+              {% else %}
+              <tr class="white-bg" id="no_content_row">
+                <td colspan="6"><div class="col-full top-bottom">
+                    <p class="text-center float-none"><i class="fa fa-exclamation-circle">&nbsp;</i>Marks are yet to be added for the students. Please <a href="{% url 'assign_marks' %}">click here</a> to add marks to the students.</p>
+                  </div></td>
+              </tr>
+              {% endif %}
+                </tbody>
+            </table>
+
+      <section class="modal-popup">
+  <div class="modal fade" id="model-edit-mark" role="dialog" aria-labelledby="exampleModalCenterTitle">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+    <form id="update_mark_form" name="update_mark_form" action='/api/v1/mark/'>
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="edit_mark_model_title">Mark</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"> <span aria-hidden="true">&times;</span> </button>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="form-spacing padding-top-20">
+                <div class="form-row">
+                <div class="col-md-4 mb-3">
+                  <input type="text" class="form-control" id="mark" name="mark" placeholder="Mark"  value="">
+                  <input type="hidden" id="mark_id" value="">
+                </div>
+              </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-light1" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-light1 edit_mark_submit">Update</button>
+        </div>
+      </div>
+       </form>
+    </div>
+  </div>
+</section>
+{% endblock %}
