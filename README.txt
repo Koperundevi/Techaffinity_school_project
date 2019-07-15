@@ -11,12 +11,12 @@ numpy
 
 pip install 'package-name'
 
-3. from the location /Techaffinity_school_project/schoolsite/ run the below commands to create the required models.
+3. from the location /schoolsite/ run the below commands to create the required models.
 
 python manage.py makemigrations web
 python manage.py migrate
 
-4. Run the application using below command from the location /Techaffinity_school_project/schoolsite/
+4. Run the application using below command from the location /schoolsite/
 
 python manage.py runserver 0.0.0.0:8000
 
